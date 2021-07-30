@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecjasso.springboot.backend.apirest.model.services.IClientService;
 import com.ecjasso.springboot.backend.apirest.models.entity.Client;
 
-@CrossOrigin(origins = { "http://localhost:3000" })
+@CrossOrigin(origins = { "http://localhost" })
 @RestController
 @RequestMapping("/api")
 public class ClientController {
