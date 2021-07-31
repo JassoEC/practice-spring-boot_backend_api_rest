@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -28,7 +29,12 @@ public class Client implements Serializable {
 
 	@Column(name = "created_at")
 	@Temporal(TemporalType.DATE)
-	private Date cretedAt;
+	private Date createdAt;
+
+	@PrePersist
+	public void prePersist() {
+		createdAt = new Date();
+	}
 
 	public Long getId() {
 		return id;
@@ -54,12 +60,20 @@ public class Client implements Serializable {
 		this.lastName = lastName;
 	}
 
-	public Date getCretedAt() {
-		return cretedAt;
+	public Date getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setCretedAt(Date cretedAt) {
-		this.cretedAt = cretedAt;
+	public void setCreatedAt(Date cretedAt) {
+		this.createdAt = cretedAt;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	/**
