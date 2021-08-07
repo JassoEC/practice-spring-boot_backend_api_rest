@@ -1,9 +1,13 @@
 package com.ecjasso.springboot.backend.apirest.controllers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,14 +36,44 @@ public class ClientController {
 	}
 
 	@GetMapping("/clients/{id}")
-	public Client show(@PathVariable Long id) {
-		return clientService.findById(id);
+	public ResponseEntity<?> show(@PathVariable Long id) {
+		Client client = null;
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			client = clientService.findById(id);
+
+		} catch (DataAccessException e) {
+			response.put("message", "Error al realizar la consulta");
+			response.put("error", e.getMessage() + " : " + e.getMostSpecificCause().getMessage());
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		if (client == null) {
+			response.put("message", "El cliente con el id: " + id + " no se encuentra");
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity<Client>(client, HttpStatus.OK);
 	}
 
 	@PostMapping("/clients")
-	@ResponseStatus(HttpStatus.CREATED)
-	public Client create(@RequestBody Client client) {
-		return clientService.save(client);
+	public ResponseEntity<?> create(@RequestBody Client client) {
+		Client newClient = null;
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			newClient = clientService.save(client);
+		} catch (DataAccessException e) {
+			response.put("message", "Error al realizar el insert en la base de datos");
+			response.put("error", e.getMessage() + " : " + e.getMostSpecificCause().getMessage());
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+
+		response.put("message", "El ciente se creo correctamente");
+		response.put("data", newClient);
+		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/clients/{id}")
