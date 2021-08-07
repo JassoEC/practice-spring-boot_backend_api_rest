@@ -21,10 +21,12 @@ public class Client implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false)
 	private String name;
+	
 	private String lastName;
 
-	@Column(unique = true)
+	@Column(unique = true, nullable = true)
 	private String email;
 
 	@Column(name = "created_at")
