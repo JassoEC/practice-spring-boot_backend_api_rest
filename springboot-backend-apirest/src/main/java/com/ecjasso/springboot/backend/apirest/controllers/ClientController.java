@@ -77,18 +77,51 @@ public class ClientController {
 	}
 
 	@PutMapping("/clients/{id}")
-	public Client update(@RequestBody Client client, @PathVariable Long id) {
+	public ResponseEntity<?> update(@RequestBody Client client, @PathVariable Long id) {
 
-		Client currentData = clientService.findById(id);
-		currentData.setName(client.getName());
-		currentData.setLastName(client.getLastName());
-		currentData.setEmail(client.getEmail());
+		Client clientUpdated = null;
+		Map<String, Object> response = new HashMap<>();
+		Client currentData = null;
 
-		return clientService.save(currentData);
+		currentData = clientService.findById(id);
+
+		if (currentData == null) {
+			response.put("message", "No existe cliente con el Id dado");
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+		}
+
+		try {
+
+			currentData.setName(client.getName());
+			currentData.setLastName(client.getLastName());
+			currentData.setEmail(client.getEmail());
+
+			clientUpdated = clientService.save(currentData);
+			response.put("message", "cliente actualizado correctamente");
+			response.put("data", clientUpdated);
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+
+		} catch (DataAccessException e) {
+			response.put("message", "No fue posible actualizar la información del cliente");
+			response.put("error", e.getMessage() + " : " + e.getMostSpecificCause().getMessage());
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@DeleteMapping("/clients/{id}")
-	public void delete(@PathVariable Long id) {
-		clientService.delelte(id);
+	public ResponseEntity<?> delete(@PathVariable Long id) {
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			clientService.delelte(id);
+			response.put("message", "Cliente se eliminó correctamante");
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+		} catch (DataAccessException e) {
+			response.put("message", "No fue posible eliminar la información del cliente");
+			response.put("error", e.getMessage() + " : " + e.getMostSpecificCause().getMessage());
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
 	}
 }
